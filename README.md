@@ -5,7 +5,7 @@ A NodeJS Express based REST API that provides an interface to Google LevelDB. Go
 
 **Description:**
 
-This REST API provides an interface to LevelDB, a NoSQL database developed by Google. The API is implemented in Node.js using the Express.js framework. User authentication is performed by the client application through the Google API. The returned access token authorizes access to the database corresponding to the user. The API can handle multiple databases simultaneously, identified by the user's email and stored in separate directories. The user's email is extracted from the valid access token.
+This REST API provides an interface to LevelDB, a fast key-value storage library written at Google that provides an ordered mapping from string keys to string values. This API is implemented in Node.js and Express.js framework. User authentication is performed by the client application through the Google API. The returned access token authorizes access to the database corresponding to the user. The API can handle multiple databases simultaneously, identified by the user's email and stored in separate directories. The user's email is extracted from the valid access token.
 
 **Features:**
 
