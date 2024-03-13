@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<head>
+    <style>
+        a {
+            text-decoration: none;
+        }
+
+        pre {
+            font-size: 6pt;
+            background: whitesmoke;
+            padding: 5px;
+            border: 1px solid lightgrey;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>JSON-UP</h1>
+        <h3>Google Autentication example for JSON-UP</h3>
+
+
+        <p>
+            get client_id and client_secret at: <a href="https://console.cloud.google.com/apis/credentials">
+                https://console.cloud.google.com/apis/credentials
+            </a>
+        </p>
+
+        <p>
+            <a id="get_code" href="">
+                1 Click to get or renew the code
+            </a>
+        </p>
+        <p>
+            Result Code
+        <pre id="result_code"></pre>
+        </p>
+        <p>
+            <a href="javascript:getAccessToken()">
+                2 click to get token
+            </a>
+        </p>
+        Result Token
+        <p>
+        <pre id="result"></pre>
+        </p>
+
+        <p>
+            Access Token
+        <pre id="result_access_key"></pre>
+        </p>
+    </div>
+
+    <script>
+
+        const client_id = "509167106205-dqqu64t7391ll6li3stvktsgband8h65.apps.googleusercontent.com";
+        const client_secret = "yXGKIEMN30u3dBkC31XugQ4n";
+        let code = "";
+
+        const gup = (atr, url) => {
+            var params = {};
+            var pairs = (url || document.URL).split("?")
+                .pop()
+                .split("&");
+            for (var i = 0, p; i < pairs.length; i++) {
+                p = pairs[i].split("=");
+                params[p[0]] = decodeURIComponent(p[1]);
+            }
+            if (atr) {
+                if (atr in params) {
+                    return params[atr];
+                } else {
+                    return "";
+                }
+            }
+            return params;
+        }
+
+        const getAccessToken = async () => {
+            var formBody = "code=" + code + "&client_id=" + client_id + "&client_secret=" + client_secret + "&redirect_uri=http://localhost:8080&grant_type=authorization_code"
+            const response = await fetch('https://oauth2.googleapis.com/token', {
+                method: "POST",
+                mode: "cors",
+                cache: "no-cache",
+                credentials: "same-origin",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
+                body: formBody
+            });
+            response.json().then((result) => {
+                console.log(result);
+                document.getElementById("result_access_key").innerText = result.access_token;
+                document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+            });
+        };
+
+        code = gup("code");
+
+        document.getElementById("get_code").href = "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=http://localhost:8080&scope=profile&email&response_type=code&include_granted_scopes=true&access_type=offline&state=state_parameter_passthrough_value"
+        document.getElementById("result_code").innerText = code;
+        console.log(gup("code"));
+    </script>
+</body>
+
+</html>
