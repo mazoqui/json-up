@@ -37,9 +37,11 @@ User authentication is performed by the client application through the Google AP
 
 The API can be used through HTTP requests. Please refer to the complete API documentation in the `README.md` file for more information on endpoints, parameters, and responses.
 
+Usage of Nodemon for hot reload
+
 **Examples:**
 
-- **Get a value:**
+- **Authorization with Google Access Token:**
 
 cURL
 
@@ -49,7 +51,7 @@ curl -X GET \
   "https://localhost:9090/api/v1/auth"
 ```
 
-- **Set a value:**
+- **Create an entry:**
 
 cURL
 
@@ -57,7 +59,27 @@ cURL
 curl -X POST \
   -H "Authorization: Bearer <access_token>" \
   -H "Content-Type: application/json" \
-  -d '{ "key": "key", "value": "value" }' \
+  -d '{ "id": "uuid", "value": "value" }' \
+  "https://localhost:9090/api/v1/:type/:id"
+```
+
+- **Fetch entries:**
+
+cURL
+
+```
+curl -X GET \
+  -H "Authorization: Bearer <access_token>" \
+  "https://localhost:9090/api/v1/:type"
+```
+
+- **Fetch an entry:**
+
+cURL
+
+```
+curl -X GET \
+  -H "Authorization: Bearer <access_token>" \
   "https://localhost:9090/api/v1/:type/:id"
 ```
 
@@ -74,6 +96,7 @@ This project is licensed under the MIT license.
 - **LevelDB: [https://github.com/google/leveldb](https://github.com/google/leveldb)**
 - **Node.js: [https://nodejs.org/en](https://nodejs.org/en)**
 - **Express.js: [https://expressjs.com/](https://expressjs.com/)**
+- **Nodemon: [https://github.com/remy/nodemon](https://github.com/remy/nodemon)**
 - **Google API Client Library for JavaScript: [https://developers.google.com/api-client-library](https://developers.google.com/api-client-library)**
 
 **Notes:**
@@ -83,3 +106,5 @@ This project is licensed under the MIT license.
 - Please read the complete API documentation before using it.
 
 **I hope this project is useful to you!**
+
+Marco Aurélio Zoqui

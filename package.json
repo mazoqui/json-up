@@ -1,0 +1,17 @@
+{
+  "name": "JSON-UP Express JS database",
+  "version": "1.0.0",
+  "description": "A NodeJS Express based REST API that provides an interface to Google LevelDB. Google access token are required for authentication and authorization.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "config": "^3.3.9",
+    "express": "^4.18.2",
+    "level": "^8.0.0"
+  }
+}
