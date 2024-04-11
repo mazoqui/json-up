@@ -9,5 +9,5 @@ module.exports = (app) => {
 
   app
     .route("/api/v1/store/:type/:id?")
-    .all(require("../handlers/crud.js")());
+    .all(require("../handlers/store.js")());
 };

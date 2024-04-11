@@ -45,12 +45,44 @@
         </p>
         Result Token
         <p>
-        <pre id="result"></pre>
+        <pre id="token"></pre>
         </p>
 
         <p>
             Access Token
-        <pre id="result_access_key"></pre>
+        <pre id="access_token"></pre>
+        </p>
+
+        <p id="usage">
+            Usage
+        <pre id="examples">
+#init database
+curl -X GET \
+-H "Authorization: Bearer access_token" \
+"http://localhost:9090/api/v1/auth"
+
+#Create entry 1 (better uuid) under the "test" entity type:
+curl -X POST \
+  -H "Authorization: Bearer access_token" \
+  -H "Content-Type: application/json" \
+  -d '{ "id": "1", "value": "value" }' \
+  "http://localhost:9090/api/v1/store/test"
+
+#Fetch entries
+curl -X GET \
+  -H "Authorization: Bearer access_token" \
+  "http://localhost:9090/api/v1/store/test"
+
+#Fetch entry 1:
+curl -X GET \
+  -H "Authorization: Bearer access_token" \
+  "http://localhost:9090/api/v1/store/test/1"
+
+#Remove entry 1:
+curl -X DELETE \
+-H "Authorization: Bearer access_token" \
+"http://localhost:9090/api/v1/store/test/1"
+        </pre>
         </p>
     </div>
 
@@ -59,6 +91,22 @@
         const client_id = "";
         const client_secret = "";
         let code = "";
+
+        const parseJwt = (payload) => {
+            return (
+                (payload &&
+                    JSON.parse(
+                        decodeURIComponent(
+                            window
+                                .atob(payload.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+                                .split("")
+                                .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                                .join("")
+                        )
+                    )) ||
+                null
+            );
+        };
 
         const gup = (atr, url) => {
             var params = {};
@@ -95,8 +143,11 @@
             });
             response.json().then((result) => {
                 console.log(result);
-                document.getElementById("result_access_key").innerText = result.access_token;
-                document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+                // console.log(parseJwt(result.access_token));
+                document.getElementById("token").innerText = JSON.stringify(result, null, 2);
+                document.getElementById("access_token").innerText = result.access_token;
+                document.getElementById("examples").innerText = document.getElementById("examples").innerText.replace(/access_token/gi, result.access_token);
+                document.getElementById("usage").style.display = "block";
             });
         };
 
@@ -104,6 +155,8 @@
 
         document.getElementById("get_code").href = "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=http://localhost:8080&scope=email&response_type=code&include_granted_scopes=true&access_type=offline&state=state_parameter_passthrough_value"
         document.getElementById("result_code").innerText = code;
+
+
         console.log(gup("code"));
     </script>
 </body>

@@ -2,6 +2,26 @@ const https = require('https');
 const createDB = require("../../database.js").createDB;
 const checkDB = require("../../database.js").checkDB;
 
+const parseJwt = (payload) => {
+  try {
+    return (
+      (payload &&
+        JSON.parse(
+          decodeURIComponent(
+            window
+              .atob(payload.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+              .split("")
+              .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+              .join("")
+          )
+        )) ||
+      null
+    );
+  } catch (error) {
+    return null;
+  }
+};
+
 const initSession = (req) => {
   const access_token = (req.get('authorization') || "").substring(7);
   return new Promise((resolve, reject) => {

@@ -63,7 +63,7 @@ const doIt = (req) => {
     }
     const dbname = (req.app.get("db") || {})[access_token];
     if (!dbname) {
-      reject({ err: "database not initialized database" })
+      reject({ err: `database not initialized database` })
       return;
     }
     let db = req.app.get(dbname) || null;
@@ -84,7 +84,8 @@ module.exports = () => {
     doIt(req).then((result) => {
       console.log(`< ${req.method} ${req.path}`);
       res.status(200).json(result);
-    }).catch(() => {
+    }).catch((e) => {
+      console.log(JSON.stringify(e))
       next();
     });
   };

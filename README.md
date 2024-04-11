@@ -48,10 +48,10 @@ cURL
 ```
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
-  "https://localhost:9090/api/v1/auth"
+  "http://localhost:9090/api/v1/auth"
 ```
 
-- **Create an entry:**
+- **Create entry 1 (better uuid) under the "test" entity type:**
 
 cURL
 
@@ -59,8 +59,8 @@ cURL
 curl -X POST \
   -H "Authorization: Bearer <access_token>" \
   -H "Content-Type: application/json" \
-  -d '{ "id": "uuid", "value": "value" }' \
-  "https://localhost:9090/api/v1/:type/:id"
+  -d '{ "id": "1", "value": "value" }' \
+  "http://localhost:9090/api/v1/store/test"
 ```
 
 - **Fetch entries:**
@@ -70,17 +70,27 @@ cURL
 ```
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
-  "https://localhost:9090/api/v1/:type"
+  "http://localhost:9090/api/v1/store/test"
 ```
 
-- **Fetch an entry:**
+- **Fetch entry 1:**
 
 cURL
 
 ```
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
-  "https://localhost:9090/api/v1/:type/:id"
+  "http://localhost:9090/api/v1/store/test/1"
+```
+
+- **Delete entry 1:**
+
+cURL
+
+```
+curl -X DELETE \
+  -H "Authorization: Bearer <access_token>" \
+  "http://localhost:9090/api/v1/store/test/1"
 ```
 
 **Contributing:**
