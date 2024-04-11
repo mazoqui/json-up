@@ -1,11 +1,11 @@
-'use strict';
 
-const fs = require('fs');
-const { Level } = require('level');
+
+import fs from 'fs';
+import { Level } from 'level';
 
 let databasePath = "";
 
-const databaseList = (app) => {
+export const databaseList = (app) => {
   return new Promise((resolve) => {
     fs.readdir(databasePath, { withFileTypes: true }, (error, files) => {
       const lst = (files || [])
@@ -16,7 +16,7 @@ const databaseList = (app) => {
   })
 }
 
-const createDB = (app, dbname) => {
+export const createDB = (app, dbname) => {
   return new Promise((resolve, reject) => {
     fs.mkdir(`${databasePath}/${dbname}`, (err) => {
       if (err) {
@@ -32,7 +32,7 @@ const createDB = (app, dbname) => {
   })
 };
 
-const checkDB = (db) => {
+export const checkDB = (db) => {
   let _cn = 0;
   const validate = (db, resolve, reject) => {
     try {
@@ -68,7 +68,7 @@ const checkDB = (db) => {
   });
 };
 
-const openDB = (app, dbname) => {
+export const openDB = (app, dbname) => {
   return new Promise((resolve, reject) => {
     checkDB(new Level(`${databasePath}/${dbname}`)).then((db) => {
       var dblist = app.get("dblist") || {};
@@ -83,7 +83,7 @@ const openDB = (app, dbname) => {
   })
 };
 
-const closeDB = (db) => {
+export const closeDB = (db) => {
   return new Promise((resolve) => {
     db.close().then(() => {
       resolve(db.location)
@@ -91,7 +91,7 @@ const closeDB = (db) => {
   })
 }
 
-const initDB = (app) => {
+export const initDB = (app) => {
   databasePath = app.get("database_path");
   databaseList(app).then((lst) => {
     (lst || []).forEach((dbname) => {
@@ -100,7 +100,7 @@ const initDB = (app) => {
   })
 };
 
-const destroyDB = (app) => {
+export const destroyDB = (app) => {
   var dblist = app.get("dblist") || {};
   Object.keys(dblist || {}).forEach((dbname) => {
     delete dblist[dbname];
@@ -116,10 +116,4 @@ const destroyDB = (app) => {
   });
 }
 
-module.exports.initDB = initDB;
-module.exports.createDB = createDB;
-module.exports.destroyDB = destroyDB;
-module.exports.databaseList = databaseList;
-module.exports.checkDB = checkDB;
-module.exports.openDB = openDB;
-module.exports.closeDB = closeDB;
+

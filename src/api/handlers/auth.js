@@ -1,6 +1,5 @@
-const https = require('https');
-const createDB = require("../../database.js").createDB;
-const checkDB = require("../../database.js").checkDB;
+import https from "https";
+import { createDB, checkDB } from "../../database.js";
 
 const parseJwt = (payload) => {
   try {
@@ -79,7 +78,7 @@ const doIt = (req) => {
   })
 };
 
-module.exports = () => {
+export const auth = () => {
   return async (req, res, next) => {
     console.log(`> ${req.method} ${req.path}`);
     doIt(req).then((result) => {

@@ -1,8 +1,9 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const config = require('config');
+import express from "express";
+import bodyParser from "body-parser";
+import config from "config";
+import { routes } from "../src/routes.js";
 
-module.exports = () => {
+export const Application = () => {
   const app = express();
 
   app.set('port', process.env.PORT || config.get('server.port'));
@@ -29,7 +30,7 @@ module.exports = () => {
   });
 
   // routes
-  require('../src/api/routes')(app);
+  routes(app);
 
   return app;
 };

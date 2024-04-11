@@ -1,9 +1,9 @@
 'use strict';
 
-const crypto = require('crypto');
+import crypto from "crypto";
 const uuid = crypto.randomUUID;
 
-module.exports = class Model {
+export default class Model {
 
   constructor(db, type) {
     this.db = db;

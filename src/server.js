@@ -1,8 +1,13 @@
 
-const initDB = require("./database.js").initDB;
-const destroyDB = require("./database.js").destroyDB;
+// const initDB = require("./database.js").initDB;
+// const destroyDB = require("./database.js").destroyDB;
 
-const app = require("../config/express.js")();
+// const app = require("../config/express.js")();
+import { initDB } from "./database.js";
+import { destroyDB } from "./database.js";
+import { Application } from "../config/express.js";
+
+const app = Application();
 const port = app.get("port");
 
 const main = () => {

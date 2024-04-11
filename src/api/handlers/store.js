@@ -1,5 +1,5 @@
-const checkDB = require("../../database.js").checkDB;
-const Model = require("../../model.js");
+import { checkDB } from "../../database.js";
+import Model from "../../model.js";
 
 const execute = (req, resolve, reject, model) => {
   switch (req.method) {
@@ -78,7 +78,7 @@ const doIt = (req) => {
   })
 };
 
-module.exports = () => {
+export const store = () => {
   return async (req, res, next) => {
     console.log(`> ${req.method} ${req.path}`);
     doIt(req).then((result) => {
