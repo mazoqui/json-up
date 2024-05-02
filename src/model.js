@@ -73,8 +73,7 @@ export default class Model {
       const process = async (db) => {
         const entityType = db.sublevel(this.type)
         let lst = [];
-        // for await (const [key, value] of entityType.iterator({ 'gt': `${this.type}/`, 'lt': `${this.type}0` })) {
-        for await (const [key, value] of entityType.iterator()) {
+        for await (const value of entityType.values()) {
           lst.push(JSON.parse(value));
         }
         resolve(lst);
