@@ -1,51 +1,104 @@
 import https from "https";
 import { createDB, checkDB } from "../../database.js";
 
-const parseJwt = (payload) => {
+const parseJwt = (token) => {
+
+  const base64urlDecode = (str) => {
+    return Buffer.from(base64urlUnescape(str), 'base64').toString();
+  };
+
+  const base64urlUnescape = (str) => {
+    str += Array(5 - str.length % 4).join('=');
+    return str.replace(/\-/g, '+').replace(/_/g, '/');
+  };
+
+  // ATTENTION: 
+  //  this function try to decode an id_token (not access_token)
+  const decodeIdToken = (token) => {
+    var segments = token.split('.');
+
+    if (segments.length !== 3) {
+      throw new Error('Not enough or too many segments');
+    }
+
+    // All segment should be base64
+    var headerSeg = segments[0];
+    var payloadSeg = segments[1];
+    var signatureSeg = segments[2];
+
+    // base64 decode and parse JSON
+    var header = JSON.parse(base64urlDecode(headerSeg));
+    var payload = JSON.parse(base64urlDecode(payloadSeg));
+
+    return {
+      header: header,
+      payload: payload,
+      signature: signatureSeg
+    }
+  };
+
+  // ATTENTION: 
+  // this function try to decode an access_token
+  const decodeAccessToken = (token) => {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+  };
+
   try {
-    return (
-      (payload &&
-        JSON.parse(
-          decodeURIComponent(
-            window
-              .atob(payload.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-              .split("")
-              .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-              .join("")
-          )
-        )) ||
-      null
-    );
+    return JSON.stringify(decodeAccessToken(token));
   } catch (error) {
-    return null;
+    try {
+      return JSON.stringify(decodeIdToken(token).payload);
+    } catch (error) {
+      return null;
+    }
   }
 };
 
+const validate = (app, token, body) => {
+  try {
+    const auth = (JSON.parse(body));
+    if (auth && auth.email) {
+      var entry = app.get("db") || {};
+      entry[token] = auth.email;
+      app.set("db", entry);
+      return entry[token];
+    }
+    throw new Error('Invalid access_token');
+  } catch (error) {
+    throw new Error('Invalid body');
+  };
+};
+
 const initSession = (req) => {
-  const access_token = (req.get('authorization') || "").substring(7);
+  const token = (req.get('authorization') || "").substring(7);
   return new Promise((resolve, reject) => {
-    if (!access_token) {
+    if (!token) {
       reject()
       return;
     }
-    https.get(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${access_token}`, (res) => {
-      let body = "";
+
+    // try first it locally
+    let body = parseJwt(token);
+    if (body) {
+      try {
+        resolve(validate(req.app, token, body));
+      } catch (error) {
+        reject();
+      }
+      return;
+    };
+
+    // then try it remotely (by google)
+    body = "";
+    https.get(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${token}`, (res) => {
       res.on("data", (chunk) => body += chunk);
       res.on("end", () => {
         try {
-          const auth = (JSON.parse(body));
-          if (auth && auth.email) {
-            var entry = req.app.get("db") || {};
-            entry[access_token] = auth.email;
-            req.app.set("db", entry);
-            resolve(entry[access_token]);
-            return;
-          }
-          reject();
+          resolve(validate(req.app, token, body));
         } catch (error) {
-          console.error(error.message);
+          console.log(error);
           reject();
-        };
+        }
       });
     }).on("error", (error) => {
       console.error(error.message);
@@ -78,7 +131,7 @@ const doIt = (req) => {
   })
 };
 
-export const auth = () => {
+export default () => {
   return async (req, res, next) => {
     console.log(`> ${req.method} ${req.path}`);
     doIt(req).then((result) => {

@@ -29,6 +29,13 @@
             </a>
         </p>
 
+        <div>
+            <input type="text" id="client_id" placeholder="client_id">
+            <input type="text" id="client_secret" placeholder="client_secret">
+            <button id="save">save local storage</button>
+            <button id="reset">reset</button>
+        </div>
+
         <p>
             <a id="get_code" href="">
                 1 Click to get or renew the code
@@ -43,70 +50,82 @@
                 2 click to get token
             </a>
         </p>
-        Result Token
         <p>
-        <pre id="token"></pre>
+            Result Token
+        <pre id="result_token"></pre>
         </p>
 
         <p>
-            Access Token
-        <pre id="access_token"></pre>
+            Result Access Token
+        <pre id="result_access_token"></pre>
         </p>
 
-        <p id="usage">
-            Usage
-        <pre id="examples">
-#init database
-curl -X GET \
--H "Authorization: Bearer access_token" \
-"http://localhost:9090/api/v1/auth"
+        <p id="usage1">
+            Usage with access_token (backend will validate against google services)
+        <pre id="examples1"> </pre>
 
-#Create entry 1 (better uuid) under the "test" entity type:
-curl -X POST \
-  -H "Authorization: Bearer access_token" \
-  -H "Content-Type: application/json" \
-  -d '{ "id": "1", "value": "value" }' \
-  "http://localhost:9090/api/v1/store/test"
-
-#Fetch entries
-curl -X GET \
-  -H "Authorization: Bearer access_token" \
-  "http://localhost:9090/api/v1/store/test"
-
-#Fetch entry 1:
-curl -X GET \
-  -H "Authorization: Bearer access_token" \
-  "http://localhost:9090/api/v1/store/test/1"
-
-#Remove entry 1:
-curl -X DELETE \
--H "Authorization: Bearer access_token" \
-"http://localhost:9090/api/v1/store/test/1"
-        </pre>
+        <p id="usage2">
+            Usage with id_token (no external validation would be required)
+        <pre id="examples2"></pre>
         </p>
     </div>
 
     <script>
 
-        const client_id = "";
-        const client_secret = "";
-        let code = "";
-
-        const parseJwt = (payload) => {
-            return (
-                (payload &&
-                    JSON.parse(
-                        decodeURIComponent(
-                            window
-                                .atob(payload.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-                                .split("")
-                                .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-                                .join("")
-                        )
-                    )) ||
-                null
-            );
+        const reset = () => {
+            client_id = "";
+            client_secret = "";
+            localStorage.remoteItem("credentials")
         };
+
+        const restore = () => {
+            let payload = JSON.parse(localStorage.getItem("credentials") || 'null');
+            if (payload) {
+                client_id = payload.client_id;
+                client_secret = payload.client_secret;
+                document.getElementById("client_id").value = client_id;
+                document.getElementById("client_secret").value = client_secret;
+                document.getElementById("get_code").href = "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=http://localhost:8080&scope=email&response_type=code&include_granted_scopes=true&access_type=offline&state=state_parameter_passthrough_value"
+                document.getElementById("result_code").innerText = code;
+            }
+        };
+
+        const save = (payload) => {
+            var payload = {
+                client_id: document.getElementById("client_id").value,
+                client_secret: document.getElementById("client_secret").value
+            }
+            client_id = payload.client_id;
+            client_secret = payload.client_secret;
+            localStorage.setItem("credentials", JSON.stringify(payload));
+        };
+
+        const example = (token) => {
+            return `
+\# init database
+curl -X GET -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/auth"
+
+# Create entry 1 (better uuid) under the "test" entity type:
+curl -X POST -H "Authorization: Bearer ${token}" -H "Content-Type: application/json"  -d '{ "id": "1", "value": "value" }' "http://localhost:9090/api/v1/store/test"
+
+# Fetch entries
+curl -X GET -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/store/test"
+
+# Fetch entry 1:
+curl -X GET -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/store/test/1"
+
+# Remove entry 1:
+curl -X DELETE -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/store/test/1"`;
+        };
+
+        const buildExamples = (result) => {
+            document.getElementById("result_token").innerText = JSON.stringify(result, null, 2);
+            document.getElementById("result_access_token").innerText = result.access_token;
+            document.getElementById("examples1").innerText = example(result.access_token || 'access_token');
+            document.getElementById("examples2").innerText = example(result.id_token || 'id_token');
+            document.getElementById("usage1").style.display = "block";
+            document.getElementById("usage2").style.display = "block";
+        }
 
         const gup = (atr, url) => {
             var params = {};
@@ -142,22 +161,20 @@ curl -X DELETE \
                 body: formBody
             });
             response.json().then((result) => {
-                console.log(result);
-                // console.log(parseJwt(result.access_token));
-                document.getElementById("token").innerText = JSON.stringify(result, null, 2);
-                document.getElementById("access_token").innerText = result.access_token;
-                document.getElementById("examples").innerText = document.getElementById("examples").innerText.replace(/access_token/gi, result.access_token);
-                document.getElementById("usage").style.display = "block";
+                buildExamples(result);
             });
         };
 
-        code = gup("code");
+        document.getElementById("save").addEventListener("click", save);
+        document.getElementById("reset").addEventListener("click", reset);
 
-        document.getElementById("get_code").href = "https://accounts.google.com/o/oauth2/auth?client_id=" + client_id + "&redirect_uri=http://localhost:8080&scope=email&response_type=code&include_granted_scopes=true&access_type=offline&state=state_parameter_passthrough_value"
-        document.getElementById("result_code").innerText = code;
+        let client_id = "";
+        let client_secret = "";
+        let code = gup("code");
 
+        restore();
+        buildExamples({ access_token: "", id_token: "" });
 
-        console.log(gup("code"));
     </script>
 </body>
 

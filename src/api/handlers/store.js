@@ -63,7 +63,7 @@ const doIt = (req) => {
     }
     const dbname = (req.app.get("db") || {})[access_token];
     if (!dbname) {
-      reject({ err: `database not initialized database` })
+      reject({ err: `user not authenticated. Call first the /api/v1/auth endpoint` })
       return;
     }
     let db = req.app.get(dbname) || null;
@@ -78,7 +78,7 @@ const doIt = (req) => {
   })
 };
 
-export const store = () => {
+export default () => {
   return async (req, res, next) => {
     console.log(`> ${req.method} ${req.path}`);
     doIt(req).then((result) => {
