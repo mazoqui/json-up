@@ -5,7 +5,7 @@ const execute = (req, resolve, reject, model) => {
   switch (req.method) {
     case "GET": {
       if ("id" in req.params && req.params.id !== undefined) {
-        model._get(req.params.id).then((r) => {
+        model.get(req.params.id).then((r) => {
           resolve(r);
         }).catch((e) => {
           console.log(e)
@@ -13,7 +13,16 @@ const execute = (req, resolve, reject, model) => {
         })
       }
       else {
-        model._all().then((r) => {
+        /*
+        on browser:
+        'filter='+encodeURIComponent("value == 'aaaa'") will be converted in filter=value%20%3D%3D%20'aaaa'
+        url?filter=value%20%3D%3D%20'aaaa'
+        
+        here at server side
+        req.query.filter = "value == 'aaaa'"
+        */
+        var promise = (req.query.filter ? model.filter(req.query.filter) : model.all());
+        promise.then((r) => {
           resolve(r);
         }).catch((e) => {
           reject(e)
@@ -24,7 +33,7 @@ const execute = (req, resolve, reject, model) => {
     }
     case "PUT":
     case "POST": {
-      model._put(req.body).then((r) => {
+      model.put(req.body).then((r) => {
         resolve(r);
       }).catch((e) => {
         reject(e);
@@ -33,7 +42,7 @@ const execute = (req, resolve, reject, model) => {
     }
     case "DELETE": {
       if ("id" in req.params && req.params.id !== undefined) {
-        model._del(req.params.id).then((r) => {
+        model.del(req.params.id).then((r) => {
           resolve(null);
         }).catch((e) => {
           resolve(null);

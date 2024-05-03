@@ -13,6 +13,8 @@
             border: 1px solid lightgrey;
             border-radius: 5px;
             min-height: 100px;
+            max-width: 100%;
+            white-space: normal;
         }
     </style>
 </head>
@@ -101,21 +103,32 @@
         };
 
         const example = (token) => {
-            return `
-\# init database
-curl -X GET -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/auth"
+            return `\
+# init database
+curl -X GET \\
+-H "Authorization: Bearer ${token}" \\
+"http://localhost:9090/api/v1/auth"
 
 # Create entry 1 (better uuid) under the "test" entity type:
-curl -X POST -H "Authorization: Bearer ${token}" -H "Content-Type: application/json"  -d '{ "id": "1", "value": "value" }' "http://localhost:9090/api/v1/store/test"
+curl -X POST \\
+-H "Authorization: Bearer ${token}" \\
+-H "Content-Type: application/json" \\
+-d '{ "id": "1", "value": "value" }' "http://localhost:9090/api/v1/store/test"
 
 # Fetch entries
-curl -X GET -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/store/test"
+curl -X GET \\
+-H "Authorization: Bearer ${token}" \\
+"http://localhost:9090/api/v1/store/test"
 
 # Fetch entry 1:
-curl -X GET -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/store/test/1"
+curl -X GET \\
+-H "Authorization: Bearer ${token}" \\
+"http://localhost:9090/api/v1/store/test/1"
 
 # Remove entry 1:
-curl -X DELETE -H "Authorization: Bearer ${token}" "http://localhost:9090/api/v1/store/test/1"`;
+curl -X DELETE \\
+-H "Authorization: Bearer ${token}" \\
+"http://localhost:9090/api/v1/store/test/1"`;
         };
 
         const buildExamples = (result) => {

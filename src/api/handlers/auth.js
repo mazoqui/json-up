@@ -96,7 +96,7 @@ const initSession = (req) => {
         try {
           resolve(validate(req.app, token, body));
         } catch (error) {
-          console.log(error);
+          // console.log(error);
           reject();
         }
       });
@@ -126,7 +126,7 @@ const doIt = (req) => {
         })
       }
     }).catch(() => {
-      reject({ status: "invalid credentials" });
+      reject("Invalid credentials");
     })
   })
 };
@@ -137,7 +137,8 @@ export default () => {
     doIt(req).then((result) => {
       console.log(`< ${req.method} ${req.path}`);
       res.status(200).json(result);
-    }).catch(() => {
+    }).catch((err) => {
+      console.log(err)
       next();
     });
   };
