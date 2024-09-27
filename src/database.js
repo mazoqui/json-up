@@ -3,12 +3,12 @@
 import fs from 'fs';
 import { Level } from 'level';
 
-let databasePath = "";
+let databasePath="";
 
-export const databaseList = (app) => {
+export const databaseList=(app) => {
   return new Promise((resolve) => {
     fs.readdir(databasePath, { withFileTypes: true }, (error, files) => {
-      const lst = (files || [])
+      const lst=(files||[])
         .filter((item) => item.isDirectory())
         .map((item) => item.name);
       resolve(lst);
@@ -16,37 +16,48 @@ export const databaseList = (app) => {
   })
 }
 
-export const createDB = (app, dbname) => {
+export const homeDir=() => {
   return new Promise((resolve, reject) => {
-    fs.mkdir(`${databasePath}/${dbname}`, (err) => {
-      if (err) {
-        reject();
-        return console.log(err);
-      }
-      openDB(app, dbname).then(() => {
-        resolve();
-      }).catch(() => {
-        reject();
-      })
-    })
+    if (fs.existsSync(databasePath)) {
+      resolve();
+    }
+    else {
+      fs.mkdir(databasePath, (err) => (err? reject():resolve()))
+    }
   })
 };
 
-export const checkDB = (db) => {
-  let _cn = 0;
-  const validate = (db, resolve, reject) => {
+export const createDB=(app, dbname) => {
+  return new Promise((resolve, reject) => {
+    homeDir().then(() => {
+      fs.mkdir(`${databasePath}/${dbname}`, (err) => {
+        if (err) {
+          reject();
+          return console.log(err);
+        }
+        openDB(app, dbname).then(() => {
+          resolve();
+        }).catch(reject)
+      })
+    }).catch(reject)
+  })
+};
+
+export const checkDB=(db) => {
+  let _cn=0;
+  const validate=(db, resolve, reject) => {
     try {
       if (db) {
-        if (db.status == "open") {
+        if (db.status=="open") {
           resolve(db)
         }
-        else if (db.status == 'closed') {
+        else if (db.status=='closed') {
           reject()
         }
         else {
           // opening...
-          _cn += 1;
-          if (_cn < 10) {
+          _cn+=1;
+          if (_cn<10) {
             setTimeout(() => {
               validate(db, resolve, reject);
             }, 200);
@@ -68,11 +79,11 @@ export const checkDB = (db) => {
   });
 };
 
-export const openDB = (app, dbname) => {
+export const openDB=(app, dbname) => {
   return new Promise((resolve, reject) => {
     checkDB(new Level(`${databasePath}/${dbname}`)).then((db) => {
-      var dblist = app.get("dblist") || {};
-      dblist[dbname] = true;
+      var dblist=app.get("dblist")||{};
+      dblist[dbname]=true;
       app.set("dblist", dblist);
       app.set(dbname, db);
       resolve();
@@ -83,7 +94,7 @@ export const openDB = (app, dbname) => {
   })
 };
 
-export const closeDB = (db) => {
+export const closeDB=(db) => {
   return new Promise((resolve) => {
     db.close().then(() => {
       resolve(db.location)
@@ -91,22 +102,22 @@ export const closeDB = (db) => {
   })
 }
 
-export const initDB = (app) => {
-  databasePath = app.get("database_path");
+export const initDB=(app) => {
+  databasePath=app.get("database_path");
   databaseList(app).then((lst) => {
-    (lst || []).forEach((dbname) => {
+    (lst||[]).forEach((dbname) => {
       openDB(app, dbname);
     });
   })
 };
 
-export const destroyDB = (app) => {
-  var dblist = app.get("dblist") || {};
-  Object.keys(dblist || {}).forEach((dbname) => {
+export const destroyDB=(app) => {
+  var dblist=app.get("dblist")||{};
+  Object.keys(dblist||{}).forEach((dbname) => {
     delete dblist[dbname];
     app.set("dblist", dblist);
     //========================
-    var db = app.get(dbname);
+    var db=app.get(dbname);
     if (db) {
       app.delete(dbname);
       closeDB(db).then((location) => {

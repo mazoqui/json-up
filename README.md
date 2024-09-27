@@ -29,6 +29,9 @@ User authentication is performed by the client application through the Google AP
 
 **Installation:**
 
+firewall ports:
+`sudo ufw allow 9090 # it requires reboot`
+
 1. Clone the GitHub repository: `git clone https://github.com/your-username/leveldb-api.git`
 2. Install dependencies: `npm install`
 3. Start the API: `npm start`
