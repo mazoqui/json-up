@@ -50,7 +50,6 @@ export default class PubSub {
       v[2]=v[2]??""; // database name
       v[3]=v[3]??""; // entity type name
       v[4]=v[4]??""; // entity id
-      console.log(message.toString())
       if (!v[0]||!v[1]||!v[2]||!v[3]||!this.listeners[`${v[0]}/${v[1]}/${v[2]}`]) return;
       try {
         let db=this.app.get(v[2])||null;
