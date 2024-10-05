@@ -6,22 +6,24 @@
 import { initDB } from "./database.js";
 import { destroyDB } from "./database.js";
 import { Application } from "../config/express.js";
+import PubSub from "../config/pubsub.js";
 
-const app = Application();
-const port = app.get("port");
+const app=Application();
+const port=app.get("port");
 
-const main = () => {
-
+const main=() => {
+  app.pubsub=new PubSub(app);
   initDB(app);
 
-  const shutdown = (server) => {
+  const shutdown=(server) => {
+    app.pubsub.close();
     server.close(() => {
       destroyDB(app);
       console.log('HTTP server closed')
     })
   };
 
-  const server = app.listen(port, () => {
+  const server=app.listen(port, () => {
     console.log(`listening http://localhost:${port}`);
   });
 

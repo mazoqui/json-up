@@ -1,10 +1,10 @@
 import { checkDB } from "../../database.js";
 import Model from "../../model.js";
 
-const execute = (req, resolve, reject, model) => {
+const execute=(req, resolve, reject, model) => {
   switch (req.method) {
     case "GET": {
-      if ("id" in req.params && req.params.id !== undefined) {
+      if ("id" in req.params&&req.params.id!==undefined) {
         model.get(req.params.id).then((r) => {
           resolve(r);
         }).catch((e) => {
@@ -21,7 +21,7 @@ const execute = (req, resolve, reject, model) => {
         here at server side
         req.query.filter = "value == 'aaaa'"
         */
-        var promise = (req.query.filter ? model.filter(req.query.filter) : model.all());
+        var promise=(req.query.filter? model.filter(req.query.filter):model.all());
         promise.then((r) => {
           resolve(r);
         }).catch((e) => {
@@ -41,7 +41,7 @@ const execute = (req, resolve, reject, model) => {
       break;
     }
     case "DELETE": {
-      if ("id" in req.params && req.params.id !== undefined) {
+      if ("id" in req.params&&req.params.id!==undefined) {
         model.del(req.params.id).then((r) => {
           resolve(null);
         }).catch((e) => {
@@ -63,22 +63,22 @@ const execute = (req, resolve, reject, model) => {
   }
 };
 
-const doIt = (req) => {
+const doIt=(req) => {
   return new Promise((resolve, reject) => {
-    const access_token = (req.get('authorization') || "").substring(7);
-    if (!access_token || !req.params.type) {
+    const access_token=(req.get('authorization')||"").substring(7);
+    if (!access_token||!req.params.type) {
       reject({ err: "Invalid access_token or entity type" })
       return;
     }
-    const dbname = (req.app.get("db") || {})[access_token];
+    const dbname=(req.app.get("db")||{})[access_token];
     if (!dbname) {
       reject({ err: `user not authenticated. Call first the /api/v1/auth endpoint` })
       return;
     }
-    let db = req.app.get(dbname) || null;
+    let db=req.app.get(dbname)||null;
     if (db) {
       checkDB(db).then((db) => {
-        execute(req, resolve, reject, new Model(db, req.params.type));
+        execute(req, resolve, reject, new Model(db, req.params.type, req.app.pubsub));
       })
     }
     else {

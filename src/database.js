@@ -3,6 +3,9 @@
 import fs from 'fs';
 import { Level } from 'level';
 
+// original classi-level 
+// https://github.com/Level/classic-level/blob/main/index.js
+
 let databasePath="";
 
 export const databaseList=(app) => {
@@ -86,6 +89,7 @@ export const openDB=(app, dbname) => {
       dblist[dbname]=true;
       app.set("dblist", dblist);
       app.set(dbname, db);
+      db.topic={ w: `store/w/${dbname}`, r: `store/r/${dbname}` }
       resolve();
     }).catch((e) => {
       console.log(e);

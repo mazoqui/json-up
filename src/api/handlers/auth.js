@@ -95,7 +95,6 @@ const initSession=(req) => {
         try {
           resolve(validate(req.app, token, body));
         } catch (error) {
-          // console.log(error);
           reject();
         }
       });
@@ -112,6 +111,7 @@ const doIt=(req) => {
       let db=req.app.get(dbname)||null;
       if (db) {
         checkDB(db).then(() => {
+          if (req.app.pubsub) req.app.pubsub.sub(db.topic.w);
           resolve({ status: 'open' });
         }).catch(() => {
           reject({ status: "error" });
