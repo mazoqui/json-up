@@ -49,9 +49,8 @@ const parseJwt=(token) => {
 
 const validate=(app, token, body) => {
   try {
-    console.log(`debug ${app.get("debug")}`);
     if (app.get("debug")){
-      console.log("token", token);
+      console.log("debug dbname", token);
       var entry=app.get("db")||{};
       entry[token]=token;
       app.set("db", entry);
@@ -107,7 +106,7 @@ const initSession=(req) => {
   })
 };
 
-const doIt=(req) => {
+export const doIt=(req) => {
   return new Promise((resolve, reject) => {
     initSession(req).then((dbname) => {
       let db=req.app.get(dbname)||null;
