@@ -2,30 +2,24 @@ import https from "https";
 import { createDB, checkDB } from "../../database.js";
 
 const parseJwt=(token) => {
-
   const base64urlDecode=(str) => {
     return Buffer.from(base64urlUnescape(str), 'base64').toString();
   };
-
   const base64urlUnescape=(str) => {
     str+=Array(5-str.length%4).join('=');
     return str.replace(/\-/g, '+').replace(/_/g, '/');
   };
-
   // ATTENTION: 
   //  this function try to decode an id_token (no access_token is required)
   const decodeIdToken=(token) => {
     var segments=token.split('.');
-
     if (segments.length!==3) {
       throw new Error('Not enough or too many segments');
     }
-
     // All segment should be base64
     var headerSeg=segments[0];
     var payloadSeg=segments[1];
     var signatureSeg=segments[2];
-
     // base64 decode and parse JSON
     var header=JSON.parse(base64urlDecode(headerSeg));
     var payload=JSON.parse(base64urlDecode(payloadSeg));
@@ -55,6 +49,14 @@ const parseJwt=(token) => {
 
 const validate=(app, token, body) => {
   try {
+    console.log(`debug ${app.get("debug")}`);
+    if (app.get("debug")){
+      console.log("token", token);
+      var entry=app.get("db")||{};
+      entry[token]=token;
+      app.set("db", entry);
+      return entry[token];
+    }
     const auth=(JSON.parse(body));
     if (auth&&auth.email) {
       var entry=app.get("db")||{};

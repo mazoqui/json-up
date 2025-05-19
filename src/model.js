@@ -20,7 +20,6 @@ export default class Model {
 
   put (payload) {
     return new Promise((resolve, reject) => {
-      console.log(`put ${this.type}/${payload.id}`);
       let item={ ...payload };
       item._$=item._$||{};
       if (item.id===undefined) {
@@ -31,6 +30,7 @@ export default class Model {
       }
       item._$.updated=new Date().getTime();
       item._$.key=`${this.type}/${item.id}`;
+      console.log(`put ${this.type}/${item.id}`);
       const entityType=this.db.sublevel(this.type);
       entityType.put(item.id, JSON.stringify(item)).then(() => {
         this.pub(item.id, item);

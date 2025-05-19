@@ -34,7 +34,17 @@ firewall ports:
 
 1. Clone the GitHub repository: `git clone https://github.com/your-username/leveldb-api.git`
 2. Install dependencies: `npm install`
-3. Start the API: `npm start`
+3. Start the API: `npm run start`
+
+**Develop server with nodemon (hot reload)**
+
+1. Start the API: `npm run dev`
+
+**Debug mode (no authentication)**
+
+1. Edit config/default.json and set debug property to true;
+2. Execute the server in dev mode `npm run dev`
+3. Make requests replacing the Authentication: Bearer <access_token> string by Authentication: DBname <database_name>
 
 **Usage:**
 
@@ -52,6 +62,12 @@ cURL
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
   "http://localhost:9090/api/v1/auth"
+
+# Debug mode:
+curl -X GET \
+  -H "Authorization: dbname test" \
+  "http://localhost:9090/api/v1/auth"
+
 ```
 
 - **Create entry 1 (better uuid) under the "test" entity type:**
@@ -61,6 +77,13 @@ cURL
 ```
 curl -X POST \
   -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{ "id": "1", "value": "value" }' \
+  "http://localhost:9090/api/v1/store/test"
+
+# Debug mode:
+curl -X POST \
+  -H "Authorization: dbname test" \
   -H "Content-Type: application/json" \
   -d '{ "id": "1", "value": "value" }' \
   "http://localhost:9090/api/v1/store/test"
@@ -74,6 +97,12 @@ cURL
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
   "http://localhost:9090/api/v1/store/test"
+
+# Debug mode:
+curl -X GET \
+  -H "Authorization: dbname test" \
+  "http://localhost:9090/api/v1/store/test"
+
 ```
 
 - **Fetch entry 1:**
@@ -83,6 +112,11 @@ cURL
 ```
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
+  "http://localhost:9090/api/v1/store/test/1"
+
+# Debug mode
+curl -X GET \
+  -H "Authorization: dbname test" \
   "http://localhost:9090/api/v1/store/test/1"
 ```
 
@@ -94,6 +128,12 @@ cURL
 curl -X DELETE \
   -H "Authorization: Bearer <access_token>" \
   "http://localhost:9090/api/v1/store/test/1"
+
+# Debug mode
+curl -X DELETE \
+  -H "Authorization: dbname test" \
+  "http://localhost:9090/api/v1/store/test/1"
+
 ```
 
 **Contributing:**

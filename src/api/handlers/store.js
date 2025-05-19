@@ -31,8 +31,20 @@ const execute=(req, resolve, reject, model) => {
       return
       break;
     }
-    case "PUT":
+    case "PUT": {
+      let payload = {...req.body};
+      if (!payload.id && "id" in req.params&&req.params.id!==undefined) {
+        payload.id=req.params.id;
+      }
+      model.put(payload).then((r) => {
+        resolve(r);
+      }).catch((e) => {
+        reject(e);
+      })
+      break;
+    }
     case "POST": {
+      console.log(req.body)
       model.put(req.body).then((r) => {
         resolve(r);
       }).catch((e) => {
