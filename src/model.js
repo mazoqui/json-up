@@ -30,7 +30,7 @@ export default class Model {
       }
       item._$.updated=new Date().getTime();
       item._$.key=`${this.type}/${item.id}`;
-      console.log(`put ${this.type}/${item.id}`);
+      // console.log(`put ${this.type}/${item.id}`);
       const entityType=this.db.sublevel(this.type);
       entityType.put(item.id, JSON.stringify(item)).then(() => {
         this.pub(item.id, item);
@@ -46,7 +46,7 @@ export default class Model {
   */
   del (id) {
     return new Promise((resolve, reject) => {
-      console.log(`del ${this.type}/${id}`);
+      // console.log(`del ${this.type}/${id}`);
       const entityType=this.db.sublevel(this.type);
       entityType.del(id).then(() => {
         this.pub(id, null);
@@ -62,7 +62,7 @@ export default class Model {
   */
   get (id) {
     return new Promise((resolve, reject) => {
-      console.log(`get ${this.type}/${id}`);
+      // console.log(`get ${this.type}/${id}`);
       const entityType=this.db.sublevel(this.type);
       entityType.get(id).then((res) => {
         resolve(JSON.parse(res));
@@ -82,7 +82,7 @@ export default class Model {
   */
   all () {
     return new Promise((resolve) => {
-      console.log(`all ${this.type}/`);
+      // console.log(`all ${this.type}/`);
       const process=async (db) => {
         const entityType=db.sublevel(this.type)
         let lst=[];

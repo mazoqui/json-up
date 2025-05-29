@@ -50,7 +50,7 @@ const parseJwt=(token) => {
 const validate=(app, token, body) => {
   try {
     if (app.get("debug")){
-      console.log("debug dbname", token);
+      // console.log("debug dbname", token);
       var entry=app.get("db")||{};
       entry[token]=token;
       app.set("db", entry);

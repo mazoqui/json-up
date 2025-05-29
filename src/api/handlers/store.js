@@ -101,9 +101,9 @@ const doIt=(req) => {
 
 export default () => {
   return async (req, res, next) => {
-    console.log(`> ${req.method} ${req.path}`);
+    console.log(`${new Date().toISOString()} > ${req.method} ${req.path}`);
     doIt(req).then((result) => {
-      console.log(`< ${req.method} ${req.path}`);
+      console.log(`${new Date().toISOString()} < ${req.method} ${req.path}`);
       res.status(200).json(result);
     }).catch((e) => {
       console.log(JSON.stringify(e))
