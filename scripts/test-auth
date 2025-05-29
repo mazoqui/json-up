@@ -1,0 +1,3 @@
+#!/bin/bash
+curl -X GET   -H "Authorization: dbname test"   "http://localhost:9090/api/v1/auth"
+
