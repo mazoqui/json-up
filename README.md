@@ -44,7 +44,8 @@ firewall ports:
 
 1. Edit config/default.json and set debug property to true;
 2. Execute the server in dev mode `npm run dev`
-3. Make requests replacing the Authentication: Bearer <access_token> string by Authentication: DBname <database_name>
+3. Open a new terminal and open the db connection by with a fake authentication: `curl -X GET -H "Authorization: dbname mydb" "http://localhost:9090/api/v1/auth"` 
+4. Now you can make store requests to the authenticated database with the HTTP header: Authentication: mydb <database_name>
 
 **Usage:**
 
